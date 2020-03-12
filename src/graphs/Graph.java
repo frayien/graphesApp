@@ -75,9 +75,25 @@ public class Graph
 		return adj_list[node];
 	}
 	
+	public int getEdgeCount()
+	{
+		int tot = 0;
+		
+		for(List<Integer> l : adj_list)
+		{
+			for(int i : l)
+			{
+				tot++;
+			}
+		}
+		
+		return tot;
+	}
+	
 	public void addEdge(int from, int to)
 	{
-		adj_list[from].add(to);
+		if(!adj_list[from].contains(to))
+			adj_list[from].add(to);
 	}
 	
 	@Override
@@ -93,5 +109,16 @@ public class Graph
 			}
 		}
 		return str.toString();
+	}
+	
+	public boolean equals(Graph other)
+	{
+		if(getNodeCount() != other.getNodeCount()) return false;
+		if(getEdgeCount() != other.getEdgeCount()) return false;
+		for(int i = 0; i<node_count; i++)
+		{
+			if(! (getEdgesFrom(i).containsAll(other.getEdgesFrom(i)) && other.getEdgesFrom(i).containsAll(getEdgesFrom(i)))) return false;
+		}
+		return true;
 	}
 }

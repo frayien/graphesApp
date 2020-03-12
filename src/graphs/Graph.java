@@ -11,6 +11,8 @@ import java.util.List;
 
 public class Graph 
 {
+	public static class ReadException extends Exception { public ReadException(String str) { super(str); } }
+	
 	private List<Integer> adj_list[];
 	private int node_count;
 	
@@ -23,7 +25,7 @@ public class Graph
 			adj_list[i] = new LinkedList<>();
 	}
 	
-	public static Graph loadFromFile(String path)
+	public static Graph loadFromASCIIFile(String path)
 	{
 		Graph graph = null;
         BufferedReader br = null;
@@ -50,9 +52,17 @@ public class Graph
         } 
         catch (FileNotFoundException e) { e.printStackTrace(); } 
         catch (IOException e) {  e.printStackTrace(); } 
+        catch(NumberFormatException e) { e.printStackTrace(); }
         finally { try { br.close(); } catch (IOException e) { } catch (NullPointerException e) { } }
         
 		return graph;
+	}
+	
+	public static Graph loadFromBinFile(String path)
+	{
+		GraphLoader gl = new GraphLoader();
+		gl.loadFromBinFile(path);
+		return gl.getGraph();
 	}
 	
 	public int getNodeCount()

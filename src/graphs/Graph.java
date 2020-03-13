@@ -70,6 +70,11 @@ public class Graph
 		return node_count;
 	}
 	
+	public int getDegreeOf(int node)
+	{
+		return adj_list[node].size();
+	}
+	
 	public List<Integer> getEdgesFrom(int node)
 	{
 		return adj_list[node];
@@ -81,10 +86,7 @@ public class Graph
 		
 		for(List<Integer> l : adj_list)
 		{
-			for(int i : l)
-			{
-				tot++;
-			}
+			tot += l.size();
 		}
 		
 		return tot;

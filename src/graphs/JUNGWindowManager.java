@@ -1,14 +1,16 @@
 package graphs;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Paint;
 import java.awt.Stroke;
 
 import javax.swing.JFrame;
 
 import org.apache.commons.collections15.Transformer;
 
-import edu.uci.ics.jung.algorithms.layout.KKLayout;
+import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -19,6 +21,20 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 public class JUNGWindowManager 
 {
 	private Graph<Integer, Integer> g = new SparseMultigraph<>();
+	private Color[] coloration;
+	
+	private static final Color[] colorcode = {
+			Color.red,
+			Color.green,
+			Color.blue,
+			Color.cyan,
+			Color.magenta,
+			Color.orange,
+			Color.pink,
+			Color.gray,
+			Color.white,
+			Color.black
+	};
 	
 	public JUNGWindowManager()
 	{
@@ -27,7 +43,7 @@ public class JUNGWindowManager
 	
 	public void run()
 	{ 
-		Layout<Integer, Integer> layout = new KKLayout<>(g);
+		Layout<Integer, Integer> layout = new CircleLayout<>(g);
 		
 		layout.setSize(new Dimension(1000,550)); 
 		
@@ -35,6 +51,13 @@ public class JUNGWindowManager
 		bvs.setPreferredSize(new Dimension(1050,600));
 		bvs.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
 		bvs.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		
+		bvs.getRenderContext().setVertexFillPaintTransformer(new Transformer<Integer, Paint>() {
+			@Override
+			public Paint transform(Integer i) {
+				return coloration[i];
+			}
+		});
 		
 		bvs.getRenderContext().setEdgeStrokeTransformer(
 				new Transformer<Integer,Stroke>(){  @Override public Stroke transform(Integer i) {
@@ -72,5 +95,17 @@ public class JUNGWindowManager
 	{
 		loadOnlyNodes(gr);
 		loadOnlyLinks(gr);
+		coloration = new Color[gr.getNodeCount()];
+		for(int i = 0; i<coloration.length; i++) coloration[i] = Color.red;
+	}
+	
+	public void load(graphs.Graph gr, int[] col)
+	{
+		loadOnlyNodes(gr);
+		loadOnlyLinks(gr);
+		coloration = new Color[gr.getNodeCount()];
+		for(int i = 0; i<coloration.length; i++)
+			coloration[i] = colorcode[col[i]];
+		
 	}
 }

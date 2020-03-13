@@ -13,12 +13,19 @@ public class Main
 		//System.out.println("");
 		//System.out.println(g1);
 		
+		long time = System.currentTimeMillis();
+		
 		int[] coloration = welshPowellAlgorithm(g);
+		
+		System.out.println(System.currentTimeMillis() - time + "ms");
+		int max = -1;
+		for(int c : coloration) if(c>max) max = c;
+		System.out.println((max+1) +" couleurs");
 		
 		
 		JUNGWindowManager jwm = new JUNGWindowManager();
-		jwm.load(g, coloration);
-		jwm.run();
+		//jwm.load(g);
+		//jwm.run();
 	}
 	
 	public static int[] welshPowellAlgorithm(Graph g)

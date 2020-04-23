@@ -6,13 +6,23 @@ import java.util.Random;
 
 public class Main
 {
+	public static Random RANDOM_GENERATOR = new Random();
+	
 	enum Algo
 	{
 		GREEDY,
-		RANDOM,
 		WELSH_POWELL,
 		DSATUR
 	}
+	
+	enum Ordre
+	{
+		ASC,
+		DESC,
+		RND
+	}
+	
+	private static Ordre ordre = Ordre.DESC;
 	
 	public static void main(String[] args)  
 	{
@@ -23,14 +33,17 @@ public class Main
 		
 		for(String str : args)
 		{
-			if(str.toLowerCase().equals("-no-gui")) no_gui = true;
+			if(str.toLowerCase().equals("-nogui")) no_gui = true;
 			else if(str.toLowerCase().equals("-gui")) no_gui = false;
 			else if(str.toLowerCase().equals("-bin")) is_bin = true;
 			else if(str.toLowerCase().equals("-raw")) is_bin = false;
 			
+			else if(str.toLowerCase().equals("-asc")) ordre = Ordre.ASC;
+			else if(str.toLowerCase().equals("-desc")) ordre = Ordre.DESC;
+			else if(str.toLowerCase().equals("-random")) ordre = Ordre.RND;
+			else if(str.toLowerCase().equals("-rnd")) ordre = Ordre.RND;
+			
 			else if(str.toLowerCase().equals("-greedy")) algo = Algo.GREEDY;
-			else if(str.toLowerCase().equals("-random")) algo = Algo.RANDOM;
-			else if(str.toLowerCase().equals("-rnd")) algo = Algo.RANDOM;
 			else if(str.toLowerCase().equals("-welsh-powell")) algo = Algo.WELSH_POWELL;
 			else if(str.toLowerCase().equals("-wp")) algo = Algo.WELSH_POWELL;
 			else if(str.toLowerCase().equals("-dsatur")) algo = Algo.DSATUR;
@@ -58,9 +71,6 @@ public class Main
 		case GREEDY:
 			coloration = greedy_algorithm(g);
 			break;
-		case RANDOM:
-			coloration = random_algorithm(g);
-			break;
 		case WELSH_POWELL:
 			coloration = welsh_powell_algorithm(g);
 			break;
@@ -76,7 +86,7 @@ public class Main
 		System.out.println("Temps d'execution : " + (System.currentTimeMillis() - time) + "ms");
 		System.out.println("Algorithme : " + algo.toString().toLowerCase());
 		System.out.println("Fichier : " + file_name);
-		System.out.println("Nombre de noeuds : " + g.getNodeCount());
+		System.out.println("Nombre de sommets : " + g.getNodeCount());
 		System.out.println("Nombre de liens : " + g.getEdgeCount());
 		int max = -1;
 		for(int c : coloration) if(c>max) max = c;
@@ -117,46 +127,36 @@ public class Main
 	
 	public static int[] greedy_algorithm(Graph g)
 	{
+		//init
 		int[] coloration = new int[g.getNodeCount()];
 		Arrays.fill(coloration, -1);
 		
-		for(int i = 0; i < g.getNodeCount(); i++)
-		{
-			coloration[i] = getLowestNextColor(g, coloration, i);
-		}
-		
-		return coloration;
-	}
-	
-	public static Random generator = new Random();
-	
-	public static int[] random_algorithm(Graph g)
-	{
-		int[] coloration = new int[g.getNodeCount()];
-		Arrays.fill(coloration, -1);
-		
+		//ordre
 		Integer[] order = new Integer[g.getNodeCount()];
-		Arrays.fill(order, -1);
-		for(int i = 0; i<order.length; i++)
+		Arrays.setAll(order, p -> p);
+		//ordonne les noeuds dans l'odre defini par ordre
+		switch(ordre)
 		{
-			int rng = generator.nextInt(g.getNodeCount()-i);
-			int n = 0;
-			while(rng != 0)
-			{
-				if(order[n] == -1) rng--;  
-				n++;
-			}
-			order[n] = i;
+		case ASC:
+			Arrays.sort(order, new Comparator<Integer>() { /*ASC*/ @Override public int compare(Integer o1, Integer o2)  { return g.getDegreeOf(o1) - g.getDegreeOf(o2); } });
+			break;
+		case DESC:
+			Arrays.sort(order, new Comparator<Integer>() { /*DESC*/ @Override public int compare(Integer o1, Integer o2)  { return g.getDegreeOf(o2) - g.getDegreeOf(o1); } });
+			break;
+		case RND:
+			Arrays.sort(order, new Comparator<Integer>() { @Override public int compare(Integer o1, Integer o2)  { return RANDOM_GENERATOR.nextInt(2)*2 -1; } });
+			break;
 		}
 		
-		for(int i = 0; i < g.getNodeCount(); i++)
+		for(int i : order)
 		{
+			//System.out.println(g.getDegreeOf(i));
 			coloration[i] = getLowestNextColor(g, coloration, i);
 		}
 		
 		return coloration;
 	}
-	
+
 	public static int[] welsh_powell_algorithm(Graph g)
 	{
 		int[] coloration = new int[g.getNodeCount()];
@@ -164,7 +164,19 @@ public class Main
 		
 		Integer[] order = new Integer[g.getNodeCount()];
 		Arrays.setAll(order,p -> p);
-		Arrays.sort(order, new Comparator<Integer>() { @Override public int compare(Integer o1, Integer o2)  { return g.getDegreeOf(o2) - g.getDegreeOf(o1); } });
+		//ordonne les noeuds dans l'odre defini par ordre
+		switch(ordre)
+		{
+		case ASC:
+			Arrays.sort(order, new Comparator<Integer>() { /*ASC*/ @Override public int compare(Integer o1, Integer o2)  { return g.getDegreeOf(o1) - g.getDegreeOf(o2); } });
+			break;
+		case DESC:
+			Arrays.sort(order, new Comparator<Integer>() { /*DESC*/ @Override public int compare(Integer o1, Integer o2)  { return g.getDegreeOf(o2) - g.getDegreeOf(o1); } });
+			break;
+		case RND:
+			Arrays.sort(order, new Comparator<Integer>() { @Override public int compare(Integer o1, Integer o2)  { return RANDOM_GENERATOR.nextInt(2)*2 -1; } });
+			break;
+		}
 		
 		int nb_colored = 0;
 		int color = 0;
@@ -190,12 +202,15 @@ public class Main
 	
 	public static int[] DSATUR_algorithm(Graph g)
 	{
+		//init
 		int[] coloration = new int[g.getNodeCount()];
 		Arrays.fill(coloration, -1);
 		
+		//init desat
 		int[] dsat = new int[g.getNodeCount()];
 		Arrays.fill(dsat, 0);
 		
+		//init order dans l'ordre descroissant
 		Integer[] order = new Integer[g.getNodeCount()];
 		Arrays.setAll(order,p -> p);
 		Arrays.sort(order, new Comparator<Integer>() { @Override public int compare(Integer o1, Integer o2)  { return g.getDegreeOf(o2) - g.getDegreeOf(o1); } });

@@ -3,11 +3,8 @@ package graphs;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.jsfml.graphics.Color;
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Font;
 import org.jsfml.graphics.PrimitiveType;
 import org.jsfml.graphics.RenderWindow;
@@ -17,6 +14,15 @@ import org.jsfml.window.ContextActivationException;
 import org.jsfml.window.VideoMode;
 import org.jsfml.window.event.Event;
 
+/**
+ * 
+ * Ancienne classe de rendu utilisant JSFML
+ * 
+ * @author garbani
+ *
+ */
+
+@Deprecated
 public class SFMLWindowManager
 {
 	private RenderWindow window;

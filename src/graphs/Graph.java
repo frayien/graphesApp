@@ -11,11 +11,13 @@ import java.util.List;
 
 public class Graph 
 {
+	@SuppressWarnings("serial")
 	public static class ReadException extends Exception { public ReadException(String str) { super(str); } }
 	
 	private List<Integer> adj_list[];
 	private int node_count;
 	
+	@SuppressWarnings("unchecked")
 	public Graph(int node_count)
 	{
 		this.node_count = node_count;
@@ -50,9 +52,9 @@ public class Graph
             	}
             }
         } 
-        catch (FileNotFoundException e) { e.printStackTrace(); } 
-        catch (IOException e) {  e.printStackTrace(); } 
-        catch(NumberFormatException e) { e.printStackTrace(); }
+        catch (FileNotFoundException e) { System.err.println(e.toString()); } 
+        catch (IOException e) { System.err.println(e.toString()); } 
+        catch(NumberFormatException e) { System.err.println(e.toString()); }
         finally { try { br.close(); } catch (IOException e) { } catch (NullPointerException e) { } }
         
 		return graph;

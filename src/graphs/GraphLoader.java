@@ -1,7 +1,6 @@
 package graphs;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,9 +48,9 @@ public class GraphLoader
             	
         } 
         catch (ReadException e) { System.err.println(e.toString()); }
-        catch (FileNotFoundException e) { e.printStackTrace(); } 
-        catch (IOException e) {  e.printStackTrace(); }
-        catch(NumberFormatException e) { System.err.println("ERROR: Corrupted preamble."); e.printStackTrace(); }
+        catch (FileNotFoundException e) { System.err.println(e.toString()); } 
+        catch (IOException e) {  System.err.println(e.toString()); }
+        catch(NumberFormatException e) { System.err.println("[ERROR] Corrupted preamble."); System.err.println(e.toString()); }
         finally { try { bis.close(); } catch (IOException e) { } catch (NullPointerException e) { } }
 	}
 	

@@ -14,16 +14,25 @@ import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
-import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+
+/**
+ * 
+ * Classe de rendu utilisant JUNG
+ * 
+ * @author garbani
+ *
+ */
 
 public class JUNGWindowManager 
 {
 	private Graph<Integer, Integer> g = new SparseMultigraph<>();
 	private Color[] coloration;
 	
-	private static final Color[] colorcode = {
+	public static final Color[] colorcode = {
 			Color.red,
 			Color.green,
 			Color.blue,
@@ -47,25 +56,31 @@ public class JUNGWindowManager
 		
 		layout.setSize(new Dimension(1000,550)); 
 		
-		BasicVisualizationServer<Integer,Integer> bvs = new BasicVisualizationServer<>(layout); 
-		bvs.setPreferredSize(new Dimension(1050,600));
-		bvs.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
-		bvs.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		VisualizationViewer<Integer,Integer> vv = new VisualizationViewer<>(layout); 
+		vv.setPreferredSize(new Dimension(1050,600));
+		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
+		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		
-		bvs.getRenderContext().setVertexFillPaintTransformer(new Transformer<Integer, Paint>() {
+		vv.getRenderContext().setVertexFillPaintTransformer(new Transformer<Integer, Paint>() {
 			@Override
 			public Paint transform(Integer i) {
 				return coloration[i];
 			}
 		});
 		
-		bvs.getRenderContext().setEdgeStrokeTransformer(
+		vv.getRenderContext().setEdgeStrokeTransformer(
 				new Transformer<Integer,Stroke>(){  @Override public Stroke transform(Integer i) {
 					return new BasicStroke(0.5f); } });
 		
+		// pour pouvoir utiliser le "drag and drop" sur les noeuds
+		DefaultModalGraphMouse<Integer,Integer> graphMouse = new DefaultModalGraphMouse<>();
+        graphMouse.setMode(edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode.PICKING);
+        vv.setGraphMouse(graphMouse);
+		
+		
 		JFrame frame = new JFrame("Simple Graph View");     
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);     
-		frame.getContentPane().add(bvs);      
+		frame.getContentPane().add(vv);      
 		frame.pack();     
 		frame.setVisible(true); 
 	}

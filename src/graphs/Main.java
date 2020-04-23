@@ -6,28 +6,96 @@ import java.util.Random;
 
 public class Main
 {
+	enum Algo
+	{
+		GREEDY,
+		RANDOM,
+		WELSH_POWELL,
+		DSATUR
+	}
+	
 	public static void main(String[] args)  
 	{
+		boolean no_gui = false;
+		boolean is_bin = false;
+		String file_name = "graphs/myciel6.col";
+		Algo algo = Algo.GREEDY;
+		
+		for(String str : args)
+		{
+			if(str.toLowerCase().equals("-no-gui")) no_gui = true;
+			else if(str.toLowerCase().equals("-gui")) no_gui = false;
+			else if(str.toLowerCase().equals("-bin")) is_bin = true;
+			else if(str.toLowerCase().equals("-raw")) is_bin = false;
+			
+			else if(str.toLowerCase().equals("-greedy")) algo = Algo.GREEDY;
+			else if(str.toLowerCase().equals("-random")) algo = Algo.RANDOM;
+			else if(str.toLowerCase().equals("-rnd")) algo = Algo.RANDOM;
+			else if(str.toLowerCase().equals("-welsh-powell")) algo = Algo.WELSH_POWELL;
+			else if(str.toLowerCase().equals("-wp")) algo = Algo.WELSH_POWELL;
+			else if(str.toLowerCase().equals("-dsatur")) algo = Algo.DSATUR;
+			else file_name = str;
+		}
+		
+		Graph g = null;
+		if(is_bin) g = Graph.loadFromBinFile(file_name);
+		else g = Graph.loadFromASCIIFile(file_name);
+		
 		//Graph g = Graph.loadFromASCIIFile("graphs/myciel6.col");
-		Graph g = Graph.loadFromBinFile("graphs/flat1000_76_0.col.b");
+		//Graph g = Graph.loadFromBinFile("graphs/flat1000_76_0.col.b");
 		//System.out.println(g);
 		//System.out.println("");
 		//System.out.println(g1);
 		
+		if(g == null) return;
+		
 		long time = System.currentTimeMillis();
 		
-		int[] coloration = DSATUR_algorithm(g);
-		//int[] coloration = welsh_powell_algorithm(g);
+		int[] coloration = null;
 		
-		System.out.println(System.currentTimeMillis() - time + "ms");
+		switch(algo)
+		{
+		case GREEDY:
+			coloration = greedy_algorithm(g);
+			break;
+		case RANDOM:
+			coloration = random_algorithm(g);
+			break;
+		case WELSH_POWELL:
+			coloration = welsh_powell_algorithm(g);
+			break;
+		case DSATUR:
+			coloration = DSATUR_algorithm(g);
+			break;
+		}
+		
+		//greedy_algorithm
+		//random_algorithm
+		//welsh_powell_algorithm
+		//DSATUR_algorithm
+		System.out.println("Temps d'execution : " + (System.currentTimeMillis() - time) + "ms");
+		System.out.println("Algorithme : " + algo.toString().toLowerCase());
+		System.out.println("Fichier : " + file_name);
+		System.out.println("Nombre de noeuds : " + g.getNodeCount());
+		System.out.println("Nombre de liens : " + g.getEdgeCount());
 		int max = -1;
 		for(int c : coloration) if(c>max) max = c;
-		System.out.println((max+1) +" couleurs");
+		System.out.println("Coloration : " + (max+1) +" couleurs");
 		
+		if(!no_gui)
+		{
+			if(max < JUNGWindowManager.colorcode.length)
+			{
+				JUNGWindowManager jwm = new JUNGWindowManager();
+				jwm.load(g, coloration);
+				jwm.run();
+			}
+			else
+			{
+				System.out.println("Il y a trop de couleurs pour afficher le graphe");
+			}
+		}
 		
-		//JUNGWindowManager jwm = new JUNGWindowManager();
-		//jwm.load(g, coloration);
-		//jwm.run();
 	}
 	
 	public static int getLowestNextColor(Graph g, int[] coloration, int node)
